@@ -1,0 +1,78 @@
+name: YouTube Shorts
+
+on:
+  schedule:
+    # Every hour at :17. The script only acts when a channel's evening slot is due.
+    - cron: "17 * * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "kit = no upload (phone kit) | private | unlisted | public"
+        default: "kit"
+        type: choice
+        options: [kit, private, unlisted, public]
+      channel:
+        description: "Channel key from config/channels.json, or all"
+        default: "history"
+      limit:
+        description: "Max videos per channel this run"
+        default: "1"
+      ignore_schedule:
+        description: "Run now even if no slot is due"
+        type: boolean
+        default: true
+      dry_run:
+        description: "Only print metadata (no upload, no Sheet write)"
+        type: boolean
+        default: false
+
+concurrency:
+  group: youtube-shorts
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          YT_REFRESH_TOKEN_HISTORY: ${{ secrets.YT_REFRESH_TOKEN_HISTORY }}
+          YT_REFRESH_TOKEN_THROTTLE: ${{ secrets.YT_REFRESH_TOKEN_THROTTLE }}
+          YT_REFRESH_TOKEN_PAWSIDE: ${{ secrets.YT_REFRESH_TOKEN_PAWSIDE }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
+          YT_MODE: ${{ inputs.mode || vars.YT_MODE || 'kit' }}
+          YT_PUBLIC_APPROVED: ${{ vars.YT_PUBLIC_APPROVED }}
+          IN_CHANNEL: ${{ inputs.channel || 'all' }}
+          IN_LIMIT: ${{ inputs.limit || '1' }}
+          IN_IGNORE: ${{ inputs.ignore_schedule }}
+          IN_DRY: ${{ inputs.dry_run }}
+        run: |
+          set -- --channel "$IN_CHANNEL" --limit "$IN_LIMIT"
+          if [ "$IN_IGNORE" = "true" ]; then set -- "$@" --ignore-schedule; fi
+          if [ "$IN_DRY" = "true" ]; then set -- "$@" --dry-run; fi
+          python -m crossposter.run_youtube "$@"
+
+  tests:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt && python -m pytest -q

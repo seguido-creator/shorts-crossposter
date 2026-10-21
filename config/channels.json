@@ -1,0 +1,79 @@
+{
+  "_comment": "One entry per YouTube channel. Only channels with enabled=true are processed. 'brand' must match the 'brand' field in the Drive .json sidecar exactly.",
+  "drive_published_folder": "Reels Autoposter - Published",
+  "sheet_id": "1KfQUvJGcv8alHZzWVYvUNN1kAWoK9DPNRcmDgSg9tCc",
+  "allowed_kinds": [
+    "explainer",
+    "photo_reel"
+  ],
+  "channels": {
+    "history": {
+      "enabled": true,
+      "brand": "History Decoded",
+      "token_secret": "YT_REFRESH_TOKEN_HISTORY",
+      "timezone": "America/New_York",
+      "slots_local": [
+        "18:30",
+        "20:30"
+      ],
+      "max_per_day": 2,
+      "category_id": "27",
+      "language": "en",
+      "default_tags": [
+        "history",
+        "world history",
+        "history facts",
+        "history explained"
+      ],
+      "source_note_default": "Images: Wikimedia Commons (public domain or free licence). Facts checked against Wikipedia and other published sources.",
+      "synthetic_media": true,
+      "file_prefixes": []
+    },
+    "throttle": {
+      "enabled": false,
+      "brand": "Throttle Decoded",
+      "token_secret": "YT_REFRESH_TOKEN_THROTTLE",
+      "timezone": "America/Chicago",
+      "slots_local": [
+        "19:00"
+      ],
+      "max_per_day": 1,
+      "category_id": "2",
+      "language": "en",
+      "default_tags": [
+        "cars",
+        "car facts",
+        "automotive",
+        "how cars work"
+      ],
+      "source_note_default": "Footage: licensed stock (Pixabay). Original script and animation.",
+      "synthetic_media": true,
+      "file_prefixes": [
+        "US_"
+      ]
+    },
+    "pawside": {
+      "enabled": false,
+      "brand": "Pawside Giggles",
+      "token_secret": "YT_REFRESH_TOKEN_PAWSIDE",
+      "timezone": "America/New_York",
+      "slots_local": [
+        "19:30"
+      ],
+      "max_per_day": 1,
+      "category_id": "15",
+      "language": "en",
+      "default_tags": [
+        "pets",
+        "dog facts",
+        "cat facts",
+        "pet care"
+      ],
+      "source_note_default": "Footage: licensed stock (Pixabay). Original script and animation.",
+      "synthetic_media": true,
+      "file_prefixes": [
+        "PAWS_"
+      ]
+    }
+  }
+}
