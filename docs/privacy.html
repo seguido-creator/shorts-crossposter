@@ -7,35 +7,57 @@
 <style>
   body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; max-width: 760px; margin: 0 auto; padding: 24px 16px; line-height: 1.6; color: #1f2328; background: #fff; }
   h1 { font-size: 1.6rem; } h2 { font-size: 1.15rem; margin-top: 1.6em; }
-  a { color: #0969da; }
+  a { color: #0969da; } .box { border: 1px solid #d0d7de; border-radius: 8px; padding: 12px 16px; background: #f6f8fa; }
 </style>
 </head>
 <body>
 <h1>Privacy Policy - Shorts Crossposter</h1>
 <p>Last updated: 22 October 2026</p>
 
-<p>Shorts Crossposter is a private tool operated by Julius Seguido (the "owner") to publish the owner's own original short videos to the owner's own YouTube channels. It is not offered to the public and has no other users.</p>
+<p>Shorts Crossposter is a private, single-user tool operated by Julius Seguido (the "owner"). It publishes the owner's own original short videos to the owner's own YouTube channels. It is not offered to the public, has no sign-up, and has no users other than the owner.</p>
 
-<h2>What data the tool uses</h2>
+<div class="box">
+<strong>Shorts Crossposter uses YouTube API Services.</strong> By using it you agree to be bound by the
+<a href="https://www.youtube.com/t/terms">YouTube Terms of Service</a>. Data handling by Google is described in the
+<a href="https://policies.google.com/privacy">Google Privacy Policy</a>.
+</div>
+
+<h2>1. Data accessed through YouTube API Services</h2>
 <ul>
-  <li><strong>Google Drive (read-only):</strong> reads video files and their description files from one folder in the owner's own Drive.</li>
-  <li><strong>Google Sheets:</strong> reads performance numbers and writes an upload log in one spreadsheet owned by the owner.</li>
-  <li><strong>YouTube Data API:</strong> uploads videos to the owner's own channels and reads basic channel and video information (titles, IDs, view counts).</li>
+  <li>Uploads videos to the owner's own channels (videos.insert) with a title, description, tags, category, language, "made for kids" setting and the altered or synthetic content disclosure.</li>
+  <li>Reads the owner's own channel name (channels.list) to confirm the correct channel before uploading.</li>
+  <li>Later: reads view counts and similar statistics of the owner's own videos (videos.list) to decide which videos to publish next.</li>
 </ul>
 
-<h2>How the data is used</h2>
-<p>The data is used only to choose which of the owner's videos to upload, to write their titles and descriptions, to upload them, and to log the result. No data is sold, shared with third parties, or used for advertising.</p>
+<h2>2. Other Google data accessed</h2>
+<ul>
+  <li><strong>Google Drive (read-only):</strong> reads video files and their description files from one folder in the owner's Drive.</li>
+  <li><strong>Google Sheets:</strong> reads performance numbers and writes an upload log in one spreadsheet owned by the owner.</li>
+</ul>
 
-<h2>Storage and security</h2>
-<p>Access tokens are stored as encrypted secrets in the owner's private GitHub repository and are used only by the tool's automated jobs. Upload logs are kept in the owner's Google Sheet. No other copy of user data is kept.</p>
+<h2>3. How the data is used</h2>
+<p>Only to choose which of the owner's videos to upload, to write their titles and descriptions, to upload them, and to log the result. No data is sold, rented, shared with third parties, used for advertising, or combined with data from other users.</p>
 
-<h2>Google API Services User Data Policy</h2>
-<p>Shorts Crossposter's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements. The tool uses YouTube API Services; see the <a href="https://www.youtube.com/t/terms">YouTube Terms of Service</a> and the <a href="https://policies.google.com/privacy">Google Privacy Policy</a>.</p>
+<h2>4. Storage and retention</h2>
+<ul>
+  <li>Access tokens are stored as encrypted secrets in the owner's private GitHub repository settings, used only by the tool's automated jobs, and never shown or logged.</li>
+  <li>Video files are downloaded only temporarily during an upload job and deleted when the job ends.</li>
+  <li>The upload log (video ID, URL, title, status) is kept in the owner's Google Sheet. Any YouTube statistics stored there are refreshed or deleted at least every 30 days.</li>
+  <li>No cookies are used. No personal data of YouTube viewers or other users is collected.</li>
+</ul>
 
-<h2>Revoking access</h2>
-<p>Access can be removed at any time at <a href="https://myaccount.google.com/permissions">myaccount.google.com/permissions</a>.</p>
+<h2>5. Revoking access and deleting data</h2>
+<ul>
+  <li>Access can be revoked at any time at <a href="https://security.google.com/settings/security/permissions">Google security settings (third-party access)</a>.</li>
+  <li>Within 7 days of revocation, or on request, all stored tokens are deleted and the upload log rows are removed.</li>
+  <li>Deletion requests: email julius.seguido@gmail.com.</li>
+</ul>
 
-<h2>Contact</h2>
-<p>Questions: julius.seguido@gmail.com</p>
+<h2>6. Google API Services User Data Policy</h2>
+<p>Shorts Crossposter's use and transfer of information received from Google APIs adheres to the <a href="https://developers.google.com/terms/api-services-user-data-policy">Google API Services User Data Policy</a>, including the Limited Use requirements.</p>
+
+<h2>7. Changes and contact</h2>
+<p>Changes to this policy are posted on this page with a new date. Questions: julius.seguido@gmail.com</p>
+<p><a href="index.html">Home</a> · <a href="terms.html">Terms of Service</a></p>
 </body>
 </html>
