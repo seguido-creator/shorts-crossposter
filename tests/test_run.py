@@ -100,6 +100,19 @@ def test_private_upload_picks_best_score_and_never_repeats(monkeypatch):
     assert len(uploaded) == 2  # second item once, then nothing left
 
 
+def test_bad_token_stops_channel_after_one_try(monkeypatch):
+    from google.auth.exceptions import RefreshError
+    uploaded = []
+    fs = setup(monkeypatch, uploaded)
+
+    def boom(*a, **k):
+        raise RefreshError("unauthorized_client: Unauthorized")
+    monkeypatch.setattr(run_youtube.youtube, "upload", boom)
+    run_youtube.main(["--mode", "private", "--channel", "history", "--ignore-schedule", "--no-gemini"])
+    statuses = [r[sheet.COLUMNS.index("status")] for r in fs.store["YouTube"][1:]]
+    assert statuses == ["FAILED_AUTH"]
+
+
 def test_public_needs_approval(monkeypatch):
     uploaded = []
     setup(monkeypatch, uploaded)

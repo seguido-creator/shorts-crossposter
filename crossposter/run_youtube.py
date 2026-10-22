@@ -16,6 +16,8 @@ import tempfile
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
+from google.auth.exceptions import RefreshError
+
 from . import drive as gdrive
 from . import metadata, originality, sheet, youtube
 from .google_clients import MissingSecret, data_clients, youtube_client
@@ -212,6 +214,11 @@ def main(argv=None) -> int:
             except MissingSecret as e:
                 log.update(row_no, {"status": "FAILED_CONFIG", "notes": str(e)})
                 print(f"  {e}")
+                break
+            except RefreshError as e:
+                log.update(row_no, {"status": "FAILED_AUTH",
+                                    "notes": f"{cfg['token_secret']} rejected: {e}"[:500]})
+                print(f"  Login token {cfg['token_secret']} rejected ({e}). Stopping this channel.")
                 break
             except Exception as e:
                 log.update(row_no, {"status": "FAILED", "notes": str(e)[:500]})
