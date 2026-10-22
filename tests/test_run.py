@@ -70,6 +70,7 @@ def make_items():
 
 def setup(monkeypatch, uploaded):
     fs = FakeSheets()
+    monkeypatch.delenv("GITHUB_STEP_SUMMARY", raising=False)  # keep test output out of the run summary
     monkeypatch.setattr(run_youtube, "data_clients", lambda: (object(), fs))
     monkeypatch.setattr(run_youtube.gdrive, "find_folder_id", lambda d, n: "folder")
     monkeypatch.setattr(run_youtube.gdrive, "list_items",
