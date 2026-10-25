@@ -91,3 +91,25 @@ def test_kit_mode_catches_up_missed_slot():
     recent = [{"status": "KIT_READY", "logged_at_utc": "2026-10-22T00:40:00+00:00"}]
     ok, _, n = due_now(HIST, recent, now, kit=True)
     assert ok and n == 1  # no 60-minute gap needed for kits
+
+
+def test_unrelated_sources_are_dropped():
+    lincoln = {
+        "title": "Abraham Lincoln and Charles Darwin Were Born on the Exact Same Day",
+        "topic": "Lincoln and Darwin Birthday Overlap",
+        "caption": "On February 12, 1809, Abraham Lincoln and Charles Darwin were born hours apart.",
+        "sources": [
+            "https://www.britannica.com/biography/Abraham-Lincoln",
+            "https://www.smithsonianmag.com/history/how-lincoln-and-darwin-shaped-the-modern-world-43397263/",
+            "https://en.wikipedia.org/wiki/Donald_Trump_and_fascism",
+            "https://doi.org/10.1016/j.jaa.2026.101767",
+        ],
+    }
+    kept = metadata.relevant_sources(lincoln)
+    assert not any("Trump" in s for s in kept) and len(kept) == 3
+    oreo = {"title": "What Do the Titanic, Oreos, and Imperial China Have in Common?",
+            "caption": "China's imperial dynasties fell, Nabisco sold its first Oreos",
+            "sources": ["https://en.wikipedia.org/wiki/Puyi", "https://en.wikipedia.org/wiki/Oreo",
+                        "https://en.wikipedia.org/wiki/History_of_climate_change_science"]}
+    kept = metadata.relevant_sources(oreo)
+    assert kept == ["https://en.wikipedia.org/wiki/Puyi", "https://en.wikipedia.org/wiki/Oreo"]

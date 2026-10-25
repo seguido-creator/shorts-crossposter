@@ -130,6 +130,8 @@ def _source_names(sources) -> list:
             "wikipedia.org": "Wikipedia", "britannica.com": "Britannica",
             "theguardian.com": "The Guardian", "loc.gov": "Library of Congress",
             "archives.gov": "US National Archives", "doi.org": "peer-reviewed journal",
+            "smithsonianmag.com": "Smithsonian Magazine", "history.com": "History.com",
+            "nationalgeographic.com": "National Geographic", "bbc.com": "BBC", "bbc.co.uk": "BBC",
         }.get(host)
         if not name and host:
             for k, v in {"wikipedia": "Wikipedia", "archives.gov": "US National Archives"}.items():
@@ -143,7 +145,7 @@ def _source_names(sources) -> list:
 
 def build_caption(meta: dict) -> str:
     body = metadata.strip_hashtag_lines(metadata.clean_text(meta.get("caption", "")))
-    srcs = _source_names(meta.get("sources"))
+    srcs = _source_names(metadata.relevant_sources(meta))
     tags = []
     for h in meta.get("hashtags") or []:
         h = metadata.norm_hashtag(str(h))

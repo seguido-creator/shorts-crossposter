@@ -44,6 +44,34 @@ def strip_hashtag_lines(caption: str) -> str:
     return "\n".join(lines).strip()
 
 
+_STOP = {"the", "and", "of", "in", "on", "a", "an", "to", "for", "with", "by", "from",
+         "how", "why", "what", "list", "history", "wiki", "biography", "www", "com", "org",
+         "html", "htm", "php", "index", "en", "article", "articles", "news", "story", "page"}
+
+
+def _words(text: str) -> set:
+    return {w for w in re.findall(r"[a-z0-9]+", (text or "").lower()) if len(w) > 2 and w not in _STOP}
+
+
+def relevant_sources(meta: dict) -> list:
+    """Drops source links that clearly have nothing to do with the video.
+    A link is dropped when its URL path names at least two topic words and none
+    of them appear in the title, topic, hook or caption. Links with no readable
+    words (DOIs, homepages, single-name pages) are kept."""
+    context = _words(" ".join(str(meta.get(k, "")) for k in ("title", "topic", "hook", "caption", "series")))
+    keep = []
+    for s in meta.get("sources") or []:
+        s = str(s).strip()
+        if not s:
+            continue
+        path = re.sub(r"^https?://[^/]+", "", s)
+        words = {w for w in _words(re.sub(r"[-_/.%]", " ", path)) if w.isalpha()}
+        if len(words) >= 2 and not (words & context):
+            continue
+        keep.append(s)
+    return keep
+
+
 def norm_hashtag(tag: str) -> str:
     tag = re.sub(r"[^\w]", "", tag.lstrip("#"))
     return f"#{tag}" if tag else ""
@@ -140,7 +168,7 @@ def build(meta: dict, channel_cfg: dict, avoid_openers=None, recent_titles=None,
         options = options or [title]
 
     body = strip_hashtag_lines(clean_text(meta.get("caption", "")))
-    sources = [clean_text(s) for s in (meta.get("sources") or []) if str(s).strip()]
+    sources = [clean_text(s) for s in relevant_sources(meta)]
     if sources:
         source_note = "Sources: " + "; ".join(sources[:5])
     else:
