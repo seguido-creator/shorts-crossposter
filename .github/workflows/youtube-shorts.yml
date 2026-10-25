@@ -2,8 +2,8 @@ name: YouTube Shorts
 
 on:
   schedule:
-    # Every hour at :17. The script only acts when a channel's evening slot is due.
-    - cron: "17 * * * *"
+    # Twice an hour (:17 and :47; GitHub sometimes skips scheduled runs). The script only acts when a channel's evening slot is due.
+    - cron: "17,47 * * * *"
   workflow_dispatch:
     inputs:
       mode:
@@ -38,8 +38,8 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip
@@ -70,8 +70,8 @@ jobs:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
           cache: pip

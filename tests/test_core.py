@@ -79,3 +79,15 @@ def test_schedule():
     assert due_now(HIST, done, later)[0]
     morning = datetime(2026, 10, 21, 14, 0, tzinfo=timezone.utc)  # 10:00 NY
     assert not due_now(HIST, [], morning)[0]
+
+
+def test_kit_mode_catches_up_missed_slot():
+    # 01:00 UTC on 22 Oct = 21:00 New York: both slots passed, nothing done yet.
+    now = datetime(2026, 10, 22, 1, 0, tzinfo=timezone.utc)
+    ok, _, n = due_now(HIST, [], now, kit=True)
+    assert ok and n == 2
+    ok, _, n = due_now(HIST, [], now, kit=False)
+    assert ok and n == 1
+    recent = [{"status": "KIT_READY", "logged_at_utc": "2026-10-22T00:40:00+00:00"}]
+    ok, _, n = due_now(HIST, recent, now, kit=True)
+    assert ok and n == 1  # no 60-minute gap needed for kits

@@ -42,20 +42,20 @@ def parse_utc(s: str):
 
 
 # ---------------------------------------------------------------- schedule
-def due_now(cfg: dict, rows: list, now_utc: datetime) -> tuple:
+def due_now(cfg: dict, rows: list, now_utc: datetime, kit: bool = False) -> tuple:
     tz = ZoneInfo(cfg["timezone"])
     local = now_utc.astimezone(tz)
     slots = sorted(cfg.get("slots_local", []))
     if not slots:
-        return False, "no slots configured"
+        return False, "no slots configured", 0
     def at(hhmm):
         h, m = map(int, hhmm.split(":"))
         return local.replace(hour=h, minute=m, second=0, microsecond=0)
     passed = sum(1 for s in slots if at(s) <= local)
     if passed == 0:
-        return False, f"before first slot ({slots[0]} {cfg['timezone']})"
+        return False, f"before first slot ({slots[0]} {cfg['timezone']})", 0
     if local > at(slots[-1]) + timedelta(hours=LATE_WINDOW_HOURS):
-        return False, "past today's posting window"
+        return False, "past today's posting window", 0
     today = [
         r for r in rows
         if r.get("status") in sheet.COUNTS_TOWARD_DAILY
@@ -63,11 +63,16 @@ def due_now(cfg: dict, rows: list, now_utc: datetime) -> tuple:
     ]
     target = min(passed, int(cfg.get("max_per_day", 1)))
     if len(today) >= target:
-        return False, f"{len(today)}/{target} done for today"
+        return False, f"{len(today)}/{target} done for today", 0
+    remaining = target - len(today)
     last = max((parse_utc(r["logged_at_utc"]) for r in today), default=None)
-    if last and now_utc - last < timedelta(minutes=MIN_GAP_MINUTES):
-        return False, "too soon after last upload"
-    return True, f"slot {passed}, {len(today)}/{target} done"
+    # Real uploads are spaced out; kits (no upload) can catch up at once when
+    # GitHub skipped a scheduled run.
+    if not kit and last and now_utc - last < timedelta(minutes=MIN_GAP_MINUTES):
+        return False, "too soon after last upload", 0
+    if not kit:
+        remaining = 1
+    return True, f"slot {passed}, {len(today)}/{target} done", remaining
 
 
 def score_of(item, scores: dict) -> float:
@@ -120,12 +125,16 @@ def main(argv=None) -> int:
             log.rows = []
 
     now = datetime.now(timezone.utc)
-    due = {}
+    due, limits = {}, {}
     for key, cfg in channels.items():
-        ok, why = (True, "schedule ignored") if args.ignore_schedule else due_now(cfg, log.channel_rows(key), now)
+        if args.ignore_schedule:
+            ok, why, n = True, "schedule ignored", args.limit
+        else:
+            ok, why, n = due_now(cfg, log.channel_rows(key), now, kit=(mode == "kit"))
         print(f"[{key}] {'DUE' if ok else 'not due'}: {why}")
         if ok:
             due[key] = cfg
+            limits[key] = max(1, n)
     if not due:
         return 0
 
@@ -149,7 +158,7 @@ def main(argv=None) -> int:
         cands.sort(key=lambda i: (score_of(i, scores), i.meta.get("posted_at_utc", "")), reverse=True)
         done = 0
         for item in cands:
-            if done >= args.limit or stop_all:
+            if done >= limits[key] or stop_all:
                 break
             meta = item.meta
             base = {
