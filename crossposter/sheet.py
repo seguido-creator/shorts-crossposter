@@ -32,47 +32,58 @@ def _col_letter(n: int) -> str:
 LAST_COL = _col_letter(len(COLUMNS))
 
 
+IG_TAB = "Instagram"
+IG_COLUMNS = [
+    "logged_at_utc", "channel", "page", "brand", "drive_file", "drive_json_id",
+    "drive_mp4_id", "fb_video_id", "mode", "status", "ig_media_id", "url",
+    "caption", "topic", "notes",
+]
+
+
 class Log:
-    def __init__(self, sheets, sheet_id: str):
+    def __init__(self, sheets, sheet_id: str, tab: str = YT_TAB, columns=None):
         self.sheets = sheets
         self.sheet_id = sheet_id
+        self.tab = tab
+        self.cols = list(columns or COLUMNS)
+        self.last_col = _col_letter(len(self.cols))
         self.rows = []  # list of dicts
 
     def ensure_tab(self):
         meta = self.sheets.spreadsheets().get(spreadsheetId=self.sheet_id).execute()
         titles = {s["properties"]["title"] for s in meta.get("sheets", [])}
-        if YT_TAB not in titles:
+        if self.tab not in titles:
             self.sheets.spreadsheets().batchUpdate(
                 spreadsheetId=self.sheet_id,
-                body={"requests": [{"addSheet": {"properties": {"title": YT_TAB}}}]},
+                body={"requests": [{"addSheet": {"properties": {"title": self.tab}}}]},
             ).execute()
             self.sheets.spreadsheets().values().update(
                 spreadsheetId=self.sheet_id,
-                range=f"{YT_TAB}!A1:{LAST_COL}1",
+                range=f"{self.tab}!A1:{self.last_col}1",
                 valueInputOption="RAW",
-                body={"values": [COLUMNS]},
+                body={"values": [self.cols]},
             ).execute()
 
     def load(self):
         res = self.sheets.spreadsheets().values().get(
-            spreadsheetId=self.sheet_id, range=f"{YT_TAB}!A1:{LAST_COL}"
+            spreadsheetId=self.sheet_id, range=f"{self.tab}!A1:{self.last_col}"
         ).execute()
         values = res.get("values", [])
         self.rows = []
         for i, row in enumerate(values[1:], start=2):
-            d = {c: (row[j] if j < len(row) else "") for j, c in enumerate(COLUMNS)}
+            d = {c: (row[j] if j < len(row) else "") for j, c in enumerate(self.cols)}
             d["_row"] = i
             self.rows.append(d)
         return self.rows
 
     # ---- queries -------------------------------------------------------
-    def handled_json_ids(self) -> set:
+    def handled_json_ids(self, final=None) -> set:
         """JSON ids never to pick again (final status or too many failures)."""
         fails = {}
         done = set()
         for r in self.rows:
             jid = r["drive_json_id"]
-            if r["status"] in FINAL_STATUSES:
+            if r["status"] in (final or FINAL_STATUSES):
                 done.add(jid)
             elif r["status"].startswith("FAILED"):
                 fails[jid] = fails.get(jid, 0) + 1
@@ -85,10 +96,10 @@ class Log:
     # ---- writes --------------------------------------------------------
     def append(self, record: dict) -> int:
         record = {**record, "logged_at_utc": record.get("logged_at_utc") or now_utc()}
-        row = [str(record.get(c, ""))[:45000] for c in COLUMNS]
+        row = [str(record.get(c, ""))[:45000] for c in self.cols]
         res = self.sheets.spreadsheets().values().append(
             spreadsheetId=self.sheet_id,
-            range=f"{YT_TAB}!A1",
+            range=f"{self.tab}!A1",
             valueInputOption="RAW",
             insertDataOption="INSERT_ROWS",
             body={"values": [row]},
@@ -104,10 +115,10 @@ class Log:
         if not row_no:
             return
         for col, val in changes.items():
-            idx = COLUMNS.index(col) + 1
+            idx = self.cols.index(col) + 1
             self.sheets.spreadsheets().values().update(
                 spreadsheetId=self.sheet_id,
-                range=f"{YT_TAB}!{_col_letter(idx)}{row_no}",
+                range=f"{self.tab}!{_col_letter(idx)}{row_no}",
                 valueInputOption="RAW",
                 body={"values": [[str(val)[:45000]]]},
             ).execute()

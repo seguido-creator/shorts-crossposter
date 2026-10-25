@@ -1,0 +1,36 @@
+{
+  "_comment": "Instagram Reels. One Instagram professional account per Facebook Page. Only enabled=true accounts are processed. Each account needs one GitHub secret: its long-lived Facebook Page token.",
+  "graph_version": "v26.0",
+  "accounts": {
+    "history": {
+      "enabled": true,
+      "brand": "History Decoded",
+      "token_secret": "IG_PAGE_TOKEN_HISTORY",
+      "timezone": "America/New_York",
+      "slots_local": ["19:00"],
+      "max_per_day": 1,
+      "ai_label": true,
+      "file_prefixes": []
+    },
+    "throttle": {
+      "enabled": false,
+      "brand": "Throttle Decoded",
+      "token_secret": "IG_PAGE_TOKEN_THROTTLE",
+      "timezone": "America/Chicago",
+      "slots_local": ["19:30"],
+      "max_per_day": 1,
+      "ai_label": true,
+      "file_prefixes": ["US_"]
+    },
+    "pawside": {
+      "enabled": false,
+      "brand": "Pawside Giggles",
+      "token_secret": "IG_PAGE_TOKEN_PAWSIDE",
+      "timezone": "America/New_York",
+      "slots_local": ["20:00"],
+      "max_per_day": 1,
+      "ai_label": true,
+      "file_prefixes": ["PAWS_"]
+    }
+  }
+}

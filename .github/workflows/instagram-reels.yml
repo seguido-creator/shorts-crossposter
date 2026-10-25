@@ -1,0 +1,56 @@
+name: Instagram Reels
+
+on:
+  schedule:
+    # Twice an hour; the script only acts when an account's evening slot is due
+    # and repo variable IG_MODE is preview or publish (default: off).
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: "off | preview (no post) | publish (needs IG_PUBLIC_APPROVED=yes)"
+        default: "preview"
+        type: choice
+        options: [off, preview, publish]
+      account:
+        description: "Account key from config/instagram.json, or all"
+        default: "history"
+      ignore_schedule:
+        description: "Run now even if no slot is due"
+        type: boolean
+        default: true
+
+concurrency:
+  group: instagram-reels
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - name: Run
+        env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+          IG_PAGE_TOKEN_HISTORY: ${{ secrets.IG_PAGE_TOKEN_HISTORY }}
+          IG_PAGE_TOKEN_THROTTLE: ${{ secrets.IG_PAGE_TOKEN_THROTTLE }}
+          IG_PAGE_TOKEN_PAWSIDE: ${{ secrets.IG_PAGE_TOKEN_PAWSIDE }}
+          IG_MODE: ${{ inputs.mode || vars.IG_MODE || 'off' }}
+          IG_PUBLIC_APPROVED: ${{ vars.IG_PUBLIC_APPROVED }}
+          IN_ACCOUNT: ${{ inputs.account || 'all' }}
+          IN_IGNORE: ${{ inputs.ignore_schedule }}
+        run: |
+          set -- --account "$IN_ACCOUNT"
+          if [ "$IN_IGNORE" = "true" ]; then set -- "$@" --ignore-schedule; fi
+          python -m crossposter.run_instagram "$@"
