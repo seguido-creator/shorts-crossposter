@@ -61,7 +61,9 @@ def due_now(cfg: dict, rows: list, now_utc: datetime, kit: bool = False) -> tupl
         if r.get("status") in sheet.COUNTS_TOWARD_DAILY
         and (d := parse_utc(r.get("logged_at_utc", ""))) and d.astimezone(tz).date() == local.date()
     ]
-    target = min(passed, int(cfg.get("max_per_day", 1)))
+    # Kits are uploaded by hand later anyway, so in kit mode prepare the whole
+    # day's kits at the first slot (GitHub often skips scheduled runs).
+    target = int(cfg.get("max_per_day", 1)) if kit else min(passed, int(cfg.get("max_per_day", 1)))
     if len(today) >= target:
         return False, f"{len(today)}/{target} done for today", 0
     remaining = target - len(today)

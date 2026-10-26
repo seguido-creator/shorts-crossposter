@@ -113,3 +113,9 @@ def test_unrelated_sources_are_dropped():
                         "https://en.wikipedia.org/wiki/History_of_climate_change_science"]}
     kept = metadata.relevant_sources(oreo)
     assert kept == ["https://en.wikipedia.org/wiki/Puyi", "https://en.wikipedia.org/wiki/Oreo"]
+
+
+def test_kit_mode_prepares_full_day_at_first_slot():
+    now = datetime(2026, 10, 21, 23, 0, tzinfo=timezone.utc)  # 19:00 NY, only slot 1 passed
+    ok, _, n = due_now(HIST, [], now, kit=True)
+    assert ok and n == 2
