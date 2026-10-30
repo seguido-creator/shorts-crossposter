@@ -128,3 +128,14 @@ def test_kit_mode_does_not_upload(monkeypatch):
     assert uploaded == []
     statuses = [r[sheet.COLUMNS.index("status")] for r in fs.store["YouTube"][1:]]
     assert statuses == ["KIT_READY", "KIT_READY"]
+
+
+def test_duplicate_guard_skips_titles_already_on_channel(monkeypatch):
+    uploaded = []
+    fs = setup(monkeypatch, uploaded)
+    monkeypatch.setattr(run_youtube.youtube, "existing_titles",
+                        lambda yt: {run_youtube.youtube.norm_title("The Day Napoleon Lost at Waterloo!")})
+    run_youtube.main(["--mode", "private", "--channel", "history", "--ignore-schedule", "--no-gemini"])
+    statuses = [r[sheet.COLUMNS.index("status")] for r in fs.store["YouTube"][1:]]
+    assert statuses == ["SKIPPED_ALREADY_ON_CHANNEL", "UPLOADED"]
+    assert uploaded == [("While Rome Burned, China Was Inventing Paper", "private")]

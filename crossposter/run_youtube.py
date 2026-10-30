@@ -152,6 +152,7 @@ def main(argv=None) -> int:
     print(f"Found {len(items)} new candidate(s); {len(scores)} performance score(s) loaded.")
 
     summary = []
+    seen_titles = {}
     stop_all = False
     for key, cfg in due.items():
         if stop_all:
@@ -206,9 +207,27 @@ def main(argv=None) -> int:
                 done += 1
                 continue
 
-            row_no = log.append({**record, "status": "UPLOADING"})
+            # Duplicate guard: skip if any of this video's titles is already on the channel
+            # (e.g. the owner uploaded the kit by hand).
             try:
                 yt = youtube_client(cfg["token_secret"])
+                if key not in seen_titles:
+                    seen_titles[key] = youtube.existing_titles(yt)
+                names = {youtube.norm_title(t) for t in out["title_options"] + [out["title"], meta.get("title", "")]}
+                names.discard("")
+                if names & seen_titles[key]:
+                    log.append({**record, "status": "SKIPPED_ALREADY_ON_CHANNEL",
+                                "notes": "A video with this title is already on the channel."})
+                    print(f"  skip {item.stem}: already on channel")
+                    continue
+            except RefreshError as e:
+                log.append({**record, "status": "FAILED_AUTH", "notes": f"{cfg['token_secret']} rejected: {e}"[:500]})
+                print(f"  Login token rejected ({e}). Stopping this channel.")
+                break
+            except Exception as e:
+                print(f"  duplicate check unavailable ({e}); continuing")
+            row_no = log.append({**record, "status": "UPLOADING"})
+            try:
                 with tempfile.TemporaryDirectory() as tmp:
                     path = gdrive.download(drive, item.mp4_id, os.path.join(tmp, "video.mp4"))
                     vid = youtube.upload(yt, path, out, mode)

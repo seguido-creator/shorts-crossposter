@@ -79,3 +79,28 @@ def channel_title(yt) -> str:
     res = yt.channels().list(part="snippet", mine=True).execute()
     items = res.get("items", [])
     return items[0]["snippet"]["title"] if items else ""
+
+
+def norm_title(t: str) -> str:
+    import re
+    return re.sub(r"[^a-z0-9]+", " ", (t or "").lower()).strip()
+
+
+def existing_titles(yt, max_items: int = 300) -> set:
+    """Normalized titles of videos already on the channel (any privacy).
+    Costs about 1 quota unit per 50 videos."""
+    res = yt.channels().list(part="contentDetails", mine=True).execute()
+    items = res.get("items", [])
+    if not items:
+        return set()
+    uploads = items[0]["contentDetails"]["relatedPlaylists"]["uploads"]
+    titles, token = set(), None
+    while len(titles) < max_items:
+        page = yt.playlistItems().list(part="snippet", playlistId=uploads, maxResults=50,
+                                       pageToken=token).execute()
+        for it in page.get("items", []):
+            titles.add(norm_title(it["snippet"].get("title", "")))
+        token = page.get("nextPageToken")
+        if not token:
+            break
+    return titles
