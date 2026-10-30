@@ -54,8 +54,8 @@ jobs:
           YT_REFRESH_TOKEN_PAWSIDE: ${{ secrets.YT_REFRESH_TOKEN_PAWSIDE }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
-          YT_MODE: ${{ inputs.mode || vars.YT_MODE || 'kit' }}
-          YT_PUBLIC_APPROVED: ${{ vars.YT_PUBLIC_APPROVED }}
+          YT_MODE: ${{ inputs.mode || vars.YT_MODE || 'public' }}
+          YT_PUBLIC_APPROVED: ${{ vars.YT_PUBLIC_APPROVED || 'yes' }}
           IN_CHANNEL: ${{ inputs.channel || 'all' }}
           IN_LIMIT: ${{ inputs.limit || '1' }}
           IN_IGNORE: ${{ inputs.ignore_schedule }}

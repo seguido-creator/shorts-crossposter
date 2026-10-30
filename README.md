@@ -16,7 +16,7 @@ to YouTube Shorts (Instagram later). It never touches the `reels-autoposter` rep
 6. Uploads (or, in kit mode, writes a phone kit) and logs every item to the **YouTube** tab.
    An item is never picked twice; a crash mid-upload leaves `UPLOADING` and is not retried.
 
-## Modes (repo variable `YT_MODE`, default `kit`)
+## Modes (repo variable `YT_MODE`; scheduled runs default to `public` since 30 Oct 2026, owner-approved)
 | mode | what happens |
 |---|---|
 | `kit` | No upload. Title/description/tags + Drive video link go to the YouTube tab for manual upload. |
