@@ -72,8 +72,8 @@ def due_now(cfg: dict, rows: list, now_utc: datetime, kit: bool = False) -> tupl
     # GitHub skipped a scheduled run.
     if not kit and last and now_utc - last < timedelta(minutes=MIN_GAP_MINUTES):
         return False, "too soon after last upload", 0
-    if not kit:
-        remaining = 1
+    # GitHub often skips scheduled runs, so a run may catch up on a missed slot
+    # (at most the slots that have already passed today).
     return True, f"slot {passed}, {len(today)}/{target} done", remaining
 
 

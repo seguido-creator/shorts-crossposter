@@ -87,7 +87,7 @@ def test_kit_mode_catches_up_missed_slot():
     ok, _, n = due_now(HIST, [], now, kit=True)
     assert ok and n == 2
     ok, _, n = due_now(HIST, [], now, kit=False)
-    assert ok and n == 1
+    assert ok and n == 2  # public uploads also catch up a missed slot
     recent = [{"status": "KIT_READY", "logged_at_utc": "2026-10-22T00:40:00+00:00"}]
     ok, _, n = due_now(HIST, recent, now, kit=True)
     assert ok and n == 1  # no 60-minute gap needed for kits
