@@ -159,6 +159,10 @@ def main(argv=None) -> int:
             break
         cands = [i for i in items if i.meta.get("brand") == cfg["brand"]]
         cands.sort(key=lambda i: (score_of(i, scores), i.meta.get("posted_at_utc", "")), reverse=True)
+        print(f"  [{key}] top candidates:")
+        for c in cands[:6]:
+            print(f"    score={score_of(c, scores):>5} fb={c.fb_video_id} {c.meta.get('topic','')[:50]}")
+        ranking_note = "; ".join(f"{score_of(c, scores)}:{c.meta.get('topic','')[:30]}" for c in cands[:5])
         done = 0
         for item in cands:
             if done >= limits[key] or stop_all:
@@ -191,7 +195,7 @@ def main(argv=None) -> int:
                 recent_titles=recent_titles,
                 use_gemini=not args.no_gemini,
             )
-            preview = {**base, "title": out["title"], "title_options": out["title_options"],
+            preview = {**base, "ranking": ranking_note, "title": out["title"], "title_options": out["title_options"],
                        "description": out["description"], "tags": out["tags"]}
             summary.append(preview)
             print(json.dumps(preview, ensure_ascii=False, indent=2))
@@ -259,7 +263,7 @@ def main(argv=None) -> int:
         with open(step, "a", encoding="utf-8") as f:
             f.write(f"## YouTube run ({mode})\n\n")
             for s in summary:
-                f.write(f"### {s['title']}\n- channel: {s['channel']} | file: {s['drive_file']}\n")
+                f.write(f"### {s['title']}\n- channel: {s['channel']} | file: {s['drive_file']}\n- ranking: {s.get('ranking','')}\n")
                 if s.get("youtube_url"):
                     f.write(f"- url: {s['youtube_url']}\n")
                 f.write(f"- title options: {' | '.join(s['title_options'])}\n- tags: {', '.join(s['tags'])}\n\n")
