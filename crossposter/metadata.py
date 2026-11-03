@@ -38,7 +38,10 @@ def clean_text(s: str) -> str:
 
 def strip_hashtag_lines(caption: str) -> str:
     """Removes trailing lines that are only hashtags (we rebuild them)."""
-    lines = caption.split("\n")
+    # Facebook-only lines (e.g. "Missed Part 1? https://www.facebook.com/reel/...") make no
+    # sense on YouTube/Instagram, so drop them.
+    lines = [l for l in caption.split("\n")
+             if not re.search(r"(facebook\.com|fb\.watch)", l, re.I)]
     while lines and (not lines[-1].strip() or re.fullmatch(r"(\s*#\w+)+\s*", lines[-1])):
         lines.pop()
     return "\n".join(lines).strip()

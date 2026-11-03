@@ -119,3 +119,9 @@ def test_kit_mode_prepares_full_day_at_first_slot():
     now = datetime(2026, 10, 21, 23, 0, tzinfo=timezone.utc)  # 19:00 NY, only slot 1 passed
     ok, _, n = due_now(HIST, [], now, kit=True)
     assert ok and n == 2
+
+
+def test_facebook_lines_removed():
+    cap = "Part 2 of 2: the Ming wall.\n\nMissed Part 1? https://www.facebook.com/reel/1620875633052915\n\n#History"
+    out = metadata.strip_hashtag_lines(metadata.clean_text(cap))
+    assert "facebook" not in out and "Ming wall" in out
