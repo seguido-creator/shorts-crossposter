@@ -2,8 +2,8 @@ name: YouTube Shorts
 
 on:
   schedule:
-    # Twice an hour (:17 and :47; GitHub sometimes skips scheduled runs). The script only acts when a channel's evening slot is due.
-    - cron: "17,47 * * * *"
+    # Every 10 minutes (GitHub often skips scheduled runs; on 3 Nov it skipped the whole evening window). The script only acts when a channel's evening slot is due.
+    - cron: "2,12,22,32,42,52 * * * *"
   workflow_dispatch:
     inputs:
       mode:
