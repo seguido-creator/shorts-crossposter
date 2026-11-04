@@ -74,6 +74,31 @@
       "file_prefixes": [
         "PAWS_"
       ]
+    },
+    "dementia": {
+      "enabled": true,
+      "wait_for_secret": true,
+      "brand": "Navigating Dementia Together",
+      "token_secret": "YT_REFRESH_TOKEN_DEMENTIA",
+      "timezone": "America/New_York",
+      "slots_local": [
+        "12:30",
+        "19:30"
+      ],
+      "max_per_day": 2,
+      "category_id": "26",
+      "language": "en",
+      "default_tags": [
+        "dementia",
+        "dementia caregiver",
+        "alzheimers care",
+        "caregiver tips"
+      ],
+      "source_note_default": "General caregiving information, not medical advice. Talk to a doctor about any sudden change.",
+      "synthetic_media": true,
+      "file_prefixes": [
+        "DEM_"
+      ]
     }
   }
 }

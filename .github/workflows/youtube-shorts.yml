@@ -52,6 +52,7 @@ jobs:
           YT_REFRESH_TOKEN_HISTORY: ${{ secrets.YT_REFRESH_TOKEN_HISTORY }}
           YT_REFRESH_TOKEN_THROTTLE: ${{ secrets.YT_REFRESH_TOKEN_THROTTLE }}
           YT_REFRESH_TOKEN_PAWSIDE: ${{ secrets.YT_REFRESH_TOKEN_PAWSIDE }}
+          YT_REFRESH_TOKEN_DEMENTIA: ${{ secrets.YT_REFRESH_TOKEN_DEMENTIA }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           GEMINI_MODEL: ${{ vars.GEMINI_MODEL }}
           YT_MODE: ${{ inputs.mode || vars.YT_MODE || 'public' }}

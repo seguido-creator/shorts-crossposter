@@ -125,3 +125,16 @@ def test_facebook_lines_removed():
     cap = "Part 2 of 2: the Ming wall.\n\nMissed Part 1? https://www.facebook.com/reel/1620875633052915\n\n#History"
     out = metadata.strip_hashtag_lines(metadata.clean_text(cap))
     assert "facebook" not in out and "Ming wall" in out
+
+
+def test_dementia_waits_for_secret_and_builds_honest_text(monkeypatch, capsys):
+    from crossposter import run_youtube
+    monkeypatch.delenv("YT_REFRESH_TOKEN_DEMENTIA", raising=False)
+    monkeypatch.setattr(run_youtube, "data_clients", lambda: (_ for _ in ()).throw(AssertionError("should not run")))
+    assert run_youtube.main(["--mode", "private", "--channel", "dementia", "--no-gemini"]) == 0
+    assert "waiting for GitHub secret YT_REFRESH_TOKEN_DEMENTIA" in capsys.readouterr().out
+    dem = {"brand": "Navigating Dementia Together", "kind": "photo_reel", "source": "original",
+           "title": "When they say something untrue, try this instead of correcting",
+           "caption": "Caregiver Tip #55: Meet the emotion first.\n\n#DementiaCaregiver", "sources": []}
+    out = metadata.build(dem, CFG["channels"]["dementia"], use_gemini=False)
+    assert "not medical advice" in out["description"] and out["category_id"] == "26"

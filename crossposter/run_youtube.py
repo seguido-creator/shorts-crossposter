@@ -111,6 +111,9 @@ def main(argv=None) -> int:
         k: v for k, v in conf["channels"].items()
         if v.get("enabled") and (args.channel in ("all", k))
     }
+    for k in [k for k, v in channels.items() if v.get("wait_for_secret") and not os.environ.get(v["token_secret"])]:
+        print(f"[{k}] waiting for GitHub secret {channels[k]['token_secret']}; skipped")
+        channels.pop(k)
     if not channels:
         print("No enabled channel matches; nothing to do.")
         return 0
