@@ -77,6 +77,25 @@ def due_now(cfg: dict, rows: list, now_utc: datetime, kit: bool = False) -> tupl
     return True, f"slot {passed}, {len(today)}/{target} done", remaining
 
 
+def seconds_to_next_slot(conf: dict, now_utc: datetime) -> int:
+    """Seconds until the next posting slot of any enabled channel (today or tomorrow), for runs
+    that start early and wait (GitHub often skips scheduled runs)."""
+    best = None
+    for cfg in conf["channels"].values():
+        if not cfg.get("enabled") or (cfg.get("wait_for_secret") and not os.environ.get(cfg["token_secret"])):
+            continue
+        tz = ZoneInfo(cfg["timezone"])
+        local = now_utc.astimezone(tz)
+        for day in (0, 1):
+            for hhmm in cfg.get("slots_local", []):
+                h, m = map(int, hhmm.split(":"))
+                t = (local + timedelta(days=day)).replace(hour=h, minute=m, second=0, microsecond=0)
+                if t > local:
+                    sec = int((t - local).total_seconds())
+                    best = sec if best is None else min(best, sec)
+    return best if best is not None else -1
+
+
 def score_of(item, scores: dict) -> float:
     fid = item.fb_video_id
     if not fid:
@@ -99,7 +118,11 @@ def main(argv=None) -> int:
     ap.add_argument("--ignore-schedule", action="store_true")
     ap.add_argument("--dry-run", action="store_true", help="print metadata only; no uploads, no Sheet writes")
     ap.add_argument("--no-gemini", action="store_true")
+    ap.add_argument("--seconds-to-next-slot", action="store_true", help="print seconds until the next slot and exit")
     args = ap.parse_args(argv)
+    if args.seconds_to_next_slot:
+        print(seconds_to_next_slot(load_config(), datetime.now(timezone.utc)))
+        return 0
 
     conf = load_config()
     mode = args.mode

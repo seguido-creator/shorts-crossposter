@@ -36,7 +36,7 @@ permissions:
 jobs:
   run:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 350
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -62,10 +62,22 @@ jobs:
           IN_IGNORE: ${{ inputs.ignore_schedule }}
           IN_DRY: ${{ inputs.dry_run }}
         run: |
+          START=$(date +%s)
           set -- --channel "$IN_CHANNEL" --limit "$IN_LIMIT"
           if [ "$IN_IGNORE" = "true" ]; then set -- "$@" --ignore-schedule; fi
           if [ "$IN_DRY" = "true" ]; then set -- "$@" --dry-run; fi
           python -m crossposter.run_youtube "$@"
+          # GitHub often skips scheduled runs. A scheduled run that starts up to 5 h before a
+          # slot waits for it here (at most 2 more slots), so the evening uploads still happen.
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            for i in 1 2; do
+              left=$(( $(date +%s) - START ))
+              wait=$(python -m crossposter.run_youtube --seconds-to-next-slot)
+              if [ "$wait" -le 0 ] || [ $(( left + wait + 600 )) -gt 19800 ]; then break; fi
+              echo "Waiting $((wait / 60)) min for the next slot"; sleep $(( wait + 90 ))
+              python -m crossposter.run_youtube "$@"
+            done
+          fi
 
   tests:
     if: github.event_name == 'workflow_dispatch'

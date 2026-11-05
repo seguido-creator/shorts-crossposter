@@ -138,3 +138,9 @@ def test_dementia_waits_for_secret_and_builds_honest_text(monkeypatch, capsys):
            "caption": "Caregiver Tip #55: Meet the emotion first.\n\n#DementiaCaregiver", "sources": []}
     out = metadata.build(dem, CFG["channels"]["dementia"], use_gemini=False)
     assert "not medical advice" in out["description"] and out["category_id"] == "26"
+
+
+def test_seconds_to_next_slot():
+    from crossposter.run_youtube import seconds_to_next_slot
+    now = datetime(2026, 11, 4, 17, 43, tzinfo=timezone.utc)  # 12:43 New York (EST)
+    assert seconds_to_next_slot(CFG, now) == (5 * 60 + 47) * 60  # 18:30 slot
