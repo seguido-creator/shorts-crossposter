@@ -77,6 +77,7 @@ def setup(monkeypatch, uploaded):
                         lambda d, f, brands, skip, **k: [i for i in make_items() if i.json_id not in skip])
     monkeypatch.setattr(run_youtube.gdrive, "download", lambda d, fid, p: p)
     monkeypatch.setattr(run_youtube, "youtube_client", lambda s: object())
+    monkeypatch.setattr(run_youtube.youtube, "channel_title", lambda yt: "History Decoded")
 
     def fake_upload(yt, path, out, privacy):
         uploaded.append((out["title"], privacy))
@@ -139,3 +140,13 @@ def test_duplicate_guard_skips_titles_already_on_channel(monkeypatch):
     statuses = [r[sheet.COLUMNS.index("status")] for r in fs.store["YouTube"][1:]]
     assert statuses == ["SKIPPED_ALREADY_ON_CHANNEL", "UPLOADED"]
     assert uploaded == [("While Rome Burned, China Was Inventing Paper", "private")]
+
+
+def test_wrong_channel_token_uploads_nothing(monkeypatch):
+    uploaded = []
+    fs = setup(monkeypatch, uploaded)
+    monkeypatch.setattr(run_youtube.youtube, "channel_title", lambda yt: "Some Other Channel")
+    run_youtube.main(["--mode", "private", "--channel", "history", "--ignore-schedule", "--no-gemini"])
+    assert uploaded == []
+    statuses = [r[sheet.COLUMNS.index("status")] for r in fs.store["YouTube"][1:]]
+    assert statuses == ["FAILED_CONFIG"]

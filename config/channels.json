@@ -27,7 +27,8 @@
       ],
       "source_note_default": "Images: Wikimedia Commons (public domain or free licence). Facts checked against Wikipedia and other published sources.",
       "synthetic_media": true,
-      "file_prefixes": []
+      "file_prefixes": [],
+      "expected_channel_title": "History Decoded"
     },
     "throttle": {
       "enabled": false,
@@ -98,7 +99,8 @@
       "synthetic_media": true,
       "file_prefixes": [
         "DEM_"
-      ]
+      ],
+      "expected_channel_title": "Navigating Dementia Together"
     }
   }
 }

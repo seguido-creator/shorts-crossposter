@@ -241,6 +241,14 @@ def main(argv=None) -> int:
             # (e.g. the owner uploaded the kit by hand).
             try:
                 yt = youtube_client(cfg["token_secret"])
+                want = cfg.get("expected_channel_title")
+                if want and key not in seen_titles:
+                    got = youtube.channel_title(yt)
+                    if got and got.strip().lower() != want.strip().lower():
+                        log.append({**record, "status": "FAILED_CONFIG",
+                                    "notes": f"{cfg['token_secret']} belongs to channel '{got}', expected '{want}'. Nothing uploaded."})
+                        print(f"  WRONG CHANNEL: token is for '{got}', expected '{want}'. Stopping this channel.")
+                        break
                 if key not in seen_titles:
                     seen_titles[key] = youtube.existing_titles(yt)
                 names = {youtube.norm_title(t) for t in out["title_options"] + [out["title"], meta.get("title", "")]}
