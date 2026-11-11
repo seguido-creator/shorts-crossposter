@@ -21,6 +21,10 @@ on:
         description: "Run now even if no slot is due"
         type: boolean
         default: true
+      check_channels:
+        description: "Only check which channel each token belongs to (no uploads)"
+        type: boolean
+        default: false
       dry_run:
         description: "Only print metadata (no upload, no Sheet write)"
         type: boolean
@@ -61,8 +65,10 @@ jobs:
           IN_LIMIT: ${{ inputs.limit || '1' }}
           IN_IGNORE: ${{ inputs.ignore_schedule }}
           IN_DRY: ${{ inputs.dry_run }}
+          IN_CHECK: ${{ inputs.check_channels }}
         run: |
           START=$(date +%s)
+          if [ "$IN_CHECK" = "true" ]; then python -m crossposter.run_youtube --check-channels; exit 0; fi
           set -- --channel "$IN_CHANNEL" --limit "$IN_LIMIT"
           if [ "$IN_IGNORE" = "true" ]; then set -- "$@" --ignore-schedule; fi
           if [ "$IN_DRY" = "true" ]; then set -- "$@" --dry-run; fi

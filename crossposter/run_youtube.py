@@ -118,8 +118,22 @@ def main(argv=None) -> int:
     ap.add_argument("--ignore-schedule", action="store_true")
     ap.add_argument("--dry-run", action="store_true", help="print metadata only; no uploads, no Sheet writes")
     ap.add_argument("--no-gemini", action="store_true")
+    ap.add_argument("--check-channels", action="store_true", help="print which channel each token belongs to; no uploads")
     ap.add_argument("--seconds-to-next-slot", action="store_true", help="print seconds until the next slot and exit")
     args = ap.parse_args(argv)
+    if args.check_channels:
+        conf = load_config()
+        for k, cfg in conf["channels"].items():
+            if not cfg.get("enabled") or not os.environ.get(cfg["token_secret"]):
+                continue
+            try:
+                got = youtube.channel_title(youtube_client(cfg["token_secret"]))
+                want = cfg.get("expected_channel_title", "")
+                ok = "OK" if not want or got.strip().lower() == want.strip().lower() else "MISMATCH"
+                print(f"[{k}] {cfg['token_secret']} -> channel '{got}' (expected '{want}') {ok}")
+            except Exception as e:
+                print(f"[{k}] {cfg['token_secret']} -> ERROR {e}")
+        return 0
     if args.seconds_to_next_slot:
         print(seconds_to_next_slot(load_config(), datetime.now(timezone.utc)))
         return 0
