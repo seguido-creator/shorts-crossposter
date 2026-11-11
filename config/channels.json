@@ -101,6 +101,106 @@
         "DEM_"
       ],
       "expected_channel_title": "Navigating Dementia Together"
+    },
+    "retirement": {
+      "enabled": true,
+      "wait_for_secret": true,
+      "timezone": "America/New_York",
+      "max_per_day": 1,
+      "category_id": "27",
+      "language": "en",
+      "synthetic_media": true,
+      "brand": "Retirement Decoded",
+      "token_secret": "YT_REFRESH_TOKEN_RETIREMENT",
+      "slots_local": [
+        "11:00"
+      ],
+      "default_tags": [
+        "retirement",
+        "social security",
+        "medicare",
+        "retirement planning"
+      ],
+      "source_note_default": "General education only, not financial advice. Check official sources like SSA.gov and Medicare.gov for your situation.",
+      "file_prefixes": [
+        "RET_"
+      ],
+      "expected_channel_title": "Retirement Decoded"
+    },
+    "credit": {
+      "enabled": true,
+      "wait_for_secret": true,
+      "timezone": "America/New_York",
+      "max_per_day": 1,
+      "category_id": "27",
+      "language": "en",
+      "synthetic_media": true,
+      "brand": "Credit Decoded",
+      "token_secret": "YT_REFRESH_TOKEN_CREDIT",
+      "slots_local": [
+        "13:00"
+      ],
+      "default_tags": [
+        "credit score",
+        "credit cards",
+        "personal finance",
+        "credit report"
+      ],
+      "source_note_default": "General education only, not financial advice. Check your own credit reports at AnnualCreditReport.com.",
+      "file_prefixes": [
+        "CRED_"
+      ],
+      "expected_channel_title": "Credit Decoded"
+    },
+    "medical_bills": {
+      "enabled": true,
+      "wait_for_secret": true,
+      "timezone": "America/New_York",
+      "max_per_day": 1,
+      "category_id": "27",
+      "language": "en",
+      "synthetic_media": true,
+      "brand": "Medical Bills Decoded",
+      "token_secret": "YT_REFRESH_TOKEN_MEDICAL_BILLS",
+      "slots_local": [
+        "15:00"
+      ],
+      "default_tags": [
+        "medical bills",
+        "health insurance",
+        "healthcare costs",
+        "insurance explained"
+      ],
+      "source_note_default": "General education only, not medical, legal or insurance advice. Check your plan documents and HealthCare.gov.",
+      "file_prefixes": [
+        "MED_"
+      ],
+      "expected_channel_title": "Medical Bills Decoded"
+    },
+    "small_business": {
+      "enabled": true,
+      "wait_for_secret": true,
+      "timezone": "America/New_York",
+      "max_per_day": 1,
+      "category_id": "27",
+      "language": "en",
+      "synthetic_media": true,
+      "brand": "Small Business Decoded",
+      "token_secret": "YT_REFRESH_TOKEN_SMALL_BUSINESS",
+      "slots_local": [
+        "17:00"
+      ],
+      "default_tags": [
+        "small business",
+        "LLC",
+        "small business taxes",
+        "entrepreneur"
+      ],
+      "source_note_default": "General education only, not tax or legal advice. Check IRS.gov or a licensed professional for your business.",
+      "file_prefixes": [
+        "SMB_"
+      ],
+      "expected_channel_title": "Small Business Decoded"
     }
   }
 }
