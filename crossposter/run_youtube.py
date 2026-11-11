@@ -220,6 +220,17 @@ def main(argv=None) -> int:
                 if not args.dry_run:
                     log.append({**base, "status": "SKIPPED_NOT_ORIGINAL", "notes": why})
                 continue
+            try:
+                part = int(meta.get("part") or 0)
+            except (TypeError, ValueError):
+                part = 0
+            if part > 0:
+                # Multi-part Reels say "Part 2 is tomorrow" etc.; YouTube won't show the parts in order.
+                print(f"  skip {item.stem}: part {part} of a multi-part series")
+                if not args.dry_run:
+                    log.append({**base, "status": "SKIPPED_MULTIPART", "title": meta.get("title", ""),
+                                "notes": f"Part {part} of a multi-part Facebook series"})
+                continue
             rows = log.channel_rows(key)
             sim, why = originality.too_similar(meta, rows)
             if sim:
