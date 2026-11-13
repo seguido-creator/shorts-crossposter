@@ -284,7 +284,9 @@ def main(argv=None) -> int:
                     print(f"  skip {item.stem}: already on channel")
                     continue
             except RefreshError as e:
-                log.append({**record, "status": "FAILED_AUTH", "notes": f"{cfg['token_secret']} rejected: {e}"[:500]})
+                prev = log.channel_rows(key)
+                if not (prev and prev[-1].get("status") == "FAILED_AUTH"):  # log once, not every run
+                    log.append({**record, "status": "FAILED_AUTH", "notes": f"{cfg['token_secret']} rejected: {e}"[:500]})
                 print(f"  Login token rejected ({e}). Stopping this channel.")
                 break
             except Exception as e:
