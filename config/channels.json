@@ -100,7 +100,8 @@
       "file_prefixes": [
         "DEM_"
       ],
-      "expected_channel_title": "Navigating Dementia Together"
+      "expected_channel_title": "Navigating Dementia Together",
+      "disclaimer_always": true
     },
     "retirement": {
       "enabled": true,
@@ -125,7 +126,8 @@
       "file_prefixes": [
         "RET_"
       ],
-      "expected_channel_title": "Retirement Decoded"
+      "expected_channel_title": "Retirement Decoded",
+      "disclaimer_always": true
     },
     "credit": {
       "enabled": true,
@@ -150,7 +152,8 @@
       "file_prefixes": [
         "CRED_"
       ],
-      "expected_channel_title": "Credit Decoded"
+      "expected_channel_title": "Credit Decoded",
+      "disclaimer_always": true
     },
     "medical_bills": {
       "enabled": true,
@@ -175,7 +178,8 @@
       "file_prefixes": [
         "MED_"
       ],
-      "expected_channel_title": "Medical Bills Decoded"
+      "expected_channel_title": "Medical Bills Decoded",
+      "disclaimer_always": true
     },
     "small_business": {
       "enabled": true,
@@ -200,7 +204,8 @@
       "file_prefixes": [
         "SMB_"
       ],
-      "expected_channel_title": "Small Business Decoded"
+      "expected_channel_title": "Small Business Decoded",
+      "disclaimer_always": true
     }
   }
 }

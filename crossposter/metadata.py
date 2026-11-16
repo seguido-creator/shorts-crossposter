@@ -174,6 +174,8 @@ def build(meta: dict, channel_cfg: dict, avoid_openers=None, recent_titles=None,
     sources = [clean_text(s) for s in relevant_sources(meta)]
     if sources:
         source_note = "Sources: " + "; ".join(sources[:5])
+        if channel_cfg.get("disclaimer_always"):
+            source_note += "\n\n" + channel_cfg.get("source_note_default", "")
     else:
         source_note = channel_cfg.get("source_note_default", "")
     ai_note = "Script written with AI assistance. Narration uses an AI voice."
