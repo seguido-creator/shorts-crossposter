@@ -78,9 +78,9 @@ jobs:
           if [ "$IN_DRY" = "true" ]; then set -- "$@" --dry-run; fi
           python -m crossposter.run_youtube "$@"
           # GitHub often skips scheduled runs. A scheduled run that starts up to 5 h before a
-          # slot waits for it here (at most 2 more slots), so the evening uploads still happen.
+          # slot waits for it here (up to 10 slots, within the job time limit), so the evening uploads still happen.
           if [ "${{ github.event_name }}" = "schedule" ]; then
-            for i in 1 2; do
+            for i in 1 2 3 4 5 6 7 8 9 10; do
               left=$(( $(date +%s) - START ))
               wait=$(python -m crossposter.run_youtube --seconds-to-next-slot)
               if [ "$wait" -le 0 ] || [ $(( left + wait + 600 )) -gt 19800 ]; then break; fi
