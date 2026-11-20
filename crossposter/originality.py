@@ -43,7 +43,18 @@ def jaccard(a: str, b: str) -> float:
     return len(ta & tb) / len(ta | tb)
 
 
-def too_similar(meta: dict, recent_rows: list) -> tuple:
+GENERIC_NAMES = {"great", "empire", "ancient", "first", "older", "history", "world", "king", "queen",
+                 "city", "year", "years", "century", "same", "time", "exact", "america", "europe", "the",
+                 "what", "why", "how", "when", "which", "this", "that", "your", "you", "did", "were", "was"}
+
+
+def _names(text: str) -> set:
+    """Capitalised words (proper names) in a title/topic, minus generic ones."""
+    found = re.findall(r"\b([A-Z][a-zA-Z\-']{2,})", text or "")
+    return {w.lower().strip("'") for w in found if w.lower() not in GENERIC_NAMES}
+
+
+def too_similar(meta: dict, recent_rows: list, check_names: bool = False) -> tuple:
     cand_topic = meta.get("topic", "")
     cand_title = meta.get("title", "")
     for r in recent_rows[-RECENT_WINDOW:]:
@@ -52,6 +63,9 @@ def too_similar(meta: dict, recent_rows: list) -> tuple:
         s = max(jaccard(cand_topic, r.get("topic", "")), jaccard(cand_title, r.get("title", "")))
         if s >= SIMILARITY_LIMIT:
             return True, f"{s:.2f} similar to '{r.get('title','')[:60]}'"
+        shared = set() if not check_names else (_names(cand_title) | _names(cand_topic)) & (_names(r.get("title", "")) | _names(r.get("topic", "")))
+        if len(shared) >= 2:
+            return True, f"same names ({', '.join(sorted(shared))}) as '{r.get('title','')[:60]}'"
     return False, ""
 
 

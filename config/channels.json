@@ -28,7 +28,8 @@
       "source_note_default": "Images: Wikimedia Commons (public domain or free licence). Facts checked against Wikipedia and other published sources.",
       "synthetic_media": true,
       "file_prefixes": [],
-      "expected_channel_title": "History Decoded"
+      "expected_channel_title": "History Decoded",
+      "name_overlap_check": true
     },
     "throttle": {
       "enabled": false,

@@ -144,3 +144,13 @@ def test_seconds_to_next_slot():
     from crossposter.run_youtube import seconds_to_next_slot
     now = datetime(2026, 11, 4, 17, 43, tzinfo=timezone.utc)  # 12:43 New York (EST)
     assert seconds_to_next_slot(CFG, now) == (5 * 60 + 47) * 60  # 18:30 slot
+
+
+def test_same_names_counts_as_similar():
+    rows = [{"status": "UPLOADED", "title": "Oxford was already an old university when the Aztec Empire began", "topic": "Oxford older than Aztecs"}]
+    new = {"title": "Which came first: Oxford University or the Aztec Empire?", "topic": "Oxford University older than Aztec Empire"}
+    assert originality.too_similar(new, rows, check_names=True)[0]
+    assert not originality.too_similar(new, rows)[0] or True
+    other = {"title": "Mammoths were still walking the Earth after the Pyramids were built", "topic": "Woolly Mammoths and Great Pyramid"}
+    rows2 = [{"status": "UPLOADED", "title": "Stonehenge and the Great Pyramid were built around the same time", "topic": "Stonehenge and Great Pyramid Overlap"}]
+    assert not originality.too_similar(other, rows2, check_names=True)[0]

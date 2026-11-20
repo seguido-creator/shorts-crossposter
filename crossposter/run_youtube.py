@@ -232,7 +232,7 @@ def main(argv=None) -> int:
                                 "notes": f"Part {part} of a multi-part Facebook series"})
                 continue
             rows = log.channel_rows(key)
-            sim, why = originality.too_similar(meta, rows)
+            sim, why = originality.too_similar(meta, rows, check_names=bool(cfg.get("name_overlap_check")))
             if sim:
                 print(f"  skip {item.stem}: {why}")
                 if not args.dry_run:
