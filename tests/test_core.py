@@ -154,3 +154,16 @@ def test_same_names_counts_as_similar():
     other = {"title": "Mammoths were still walking the Earth after the Pyramids were built", "topic": "Woolly Mammoths and Great Pyramid"}
     rows2 = [{"status": "UPLOADED", "title": "Stonehenge and the Great Pyramid were built around the same time", "topic": "Stonehenge and Great Pyramid Overlap"}]
     assert not originality.too_similar(other, rows2, check_names=True)[0]
+
+
+def test_political_and_one_word_wiki_matches_dropped():
+    med = {"title": "Treat your itemized medical bill like a grocery receipt", "topic": "Reading codes on itemized bill",
+           "sources": ["https://www.cms.gov/medical-bill-rights/know-your-rights/using-insurance",
+                       "https://en.wikipedia.org/wiki/One_Big_Beautiful_Bill_Act", "https://en.wikipedia.org/wiki/Superbill"]}
+    kept = metadata.relevant_sources(med)
+    assert not any("Beautiful" in k for k in kept) and any("cms.gov" in k for k in kept)
+    smb = {"title": "A 50% markup is not a 50% margin", "topic": "Markup versus margin pricing mix-up",
+           "sources": ["https://www.sba.gov/", "https://en.wikipedia.org/wiki/340B_Drug_Pricing_Program"]}
+    assert metadata.relevant_sources(smb) == ["https://www.sba.gov/"]
+    st = {"title": "Stonehenge was started centuries before the Great Pyramid", "sources": ["https://en.wikipedia.org/wiki/Stonehenge"]}
+    assert metadata.relevant_sources(st) == ["https://en.wikipedia.org/wiki/Stonehenge"]

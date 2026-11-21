@@ -14,7 +14,7 @@ STOP = {
     "can", "do", "does", "be", "at", "by", "from", "still", "more", "most",
 }
 SIMILARITY_LIMIT = 0.6
-RECENT_WINDOW = 30
+RECENT_WINDOW = 400  # whole recent channel history (repeats slipped past a 30-row window)
 PACK_HINTS = ("bundle", "mzshop", "mz shop", "pack")
 
 

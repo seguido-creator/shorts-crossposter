@@ -56,6 +56,10 @@ def _words(text: str) -> set:
     return {w for w in re.findall(r"[a-z0-9]+", (text or "").lower()) if len(w) > 2 and w not in _STOP}
 
 
+POLITICAL_WORDS = {"trump", "biden", "harris", "obama", "fascism", "maga", "republican", "democrat",
+                   "democratic", "gop", "beautiful", "election", "elections", "campaign"}
+
+
 def relevant_sources(meta: dict) -> list:
     """Drops source links that clearly have nothing to do with the video.
     A link is dropped when its URL path names at least two topic words and none
@@ -69,7 +73,14 @@ def relevant_sources(meta: dict) -> list:
             continue
         path = re.sub(r"^https?://[^/]+", "", s)
         words = {w for w in _words(re.sub(r"[-_/.%]", " ", path)) if w.isalpha()}
-        if len(words) >= 2 and not (words & context):
+        if words & POLITICAL_WORDS:
+            continue  # never link modern party politics from these channels
+        overlap = words & context
+        if len(words) >= 2 and not overlap:
+            continue
+        # Wikipedia pages with long titles must share at least 2 words with the video
+        # (stops e.g. "One Big Beautiful Bill Act" matching a "medical bill" video on one word).
+        if "wikipedia.org" in s and len(words) >= 3 and len(overlap) < 2:
             continue
         keep.append(s)
     return keep
