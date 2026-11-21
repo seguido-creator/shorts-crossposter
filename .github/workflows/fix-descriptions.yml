@@ -1,0 +1,37 @@
+name: Fix descriptions
+
+on:
+  workflow_dispatch:
+    inputs:
+      fixes:
+        description: 'JSON list: [{"channel":"credit","video_id":"...","remove":["https://..."]}]'
+        required: true
+      dry_run:
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  fix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - env:
+          YT_CLIENT_ID: ${{ secrets.YT_CLIENT_ID }}
+          YT_CLIENT_SECRET: ${{ secrets.YT_CLIENT_SECRET }}
+          YT_REFRESH_TOKEN_CREDIT: ${{ secrets.YT_REFRESH_TOKEN_CREDIT }}
+          YT_REFRESH_TOKEN_MEDICAL_BILLS: ${{ secrets.YT_REFRESH_TOKEN_MEDICAL_BILLS }}
+          YT_REFRESH_TOKEN_SMALL_BUSINESS: ${{ secrets.YT_REFRESH_TOKEN_SMALL_BUSINESS }}
+          YT_REFRESH_TOKEN_RETIREMENT: ${{ secrets.YT_REFRESH_TOKEN_RETIREMENT }}
+          YT_REFRESH_TOKEN_DEMENTIA: ${{ secrets.YT_REFRESH_TOKEN_DEMENTIA }}
+          FIXES: ${{ inputs.fixes }}
+          DRY: ${{ inputs.dry_run }}
+        run: |
+          if [ "$DRY" = "true" ]; then python -m crossposter.fix_descriptions --dry-run; else python -m crossposter.fix_descriptions; fi
